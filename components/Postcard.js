@@ -1,43 +1,41 @@
 import Link from "next/link";
-import { formatDate } from "@/lib/format";
-import styles from "./Postlist.module.css";
+import styles from "./Postcard.module.css";
 
-export default function PostCard({ post }) {
-  // With ?_embed, WordPress includes the featured image and categories in _embedded
-  const image = post._embedded?.["wp:featuredmedia"]?.[0];
-  const categories = post._embedded?.["wp:term"]?.[0] ?? [];
-  const date = formatDate(post.date);
+export default function Postcard({ post }) {
+  const image = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+
+  const category = post._embedded?.["wp:term"]?.[0]?.[0]?.name;
 
   return (
     <article className={styles.card}>
-      {image && (
-        <img
-          className={styles.image}
-          src={image.source_url}
-          alt={image.alt_text}
+      <div className={styles.content}>
+        {category && <div className={styles.category}>{category}</div>}
+
+        <div className={styles.date}>
+          {new Date(post.date).toLocaleDateString("da-DK", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </div>
+
+        <h2 className={styles.title}>{post.title.rendered}</h2>
+      </div>
+
+      {image && <img src={image} alt="" className={styles.image} />}
+
+      <div className={styles.content}>
+        <div
+          className={styles.excerpt}
+          dangerouslySetInnerHTML={{
+            __html: post.excerpt.rendered,
+          }}
         />
-      )}
-      {categories.length > 0 && (
-        <ul className={styles.categories}>
-          {categories.map((category) => (
-            <li key={category.id}>{category.name}</li>
-          ))}
-        </ul>
-      )}
-      <time className={styles.date} dateTime={post.date}>
-        {date}
-      </time>
-      <h2
-        className={styles.title}
-        dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-      />
-      <div
-        className={styles.excerpt}
-        dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
-      />
-      <Link href={`/posts/${post.slug}`} className={styles.link}>
-        Read more
-      </Link>
+
+        <Link href={`/posts/${post.slug}`} className={styles.link}>
+          Read more
+        </Link>
+      </div>
     </article>
   );
 }

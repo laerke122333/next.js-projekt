@@ -1,16 +1,14 @@
-import PostCard from "@/components/Postcard";
+import Postcard from "./Postcard";
 import styles from "./Postlist.module.css";
 
 export default function PostList({ posts }) {
-  if (posts.length === 0) {
-    return <p>There are no posts yet.</p>;
-  }
-
   return (
-    <section className={styles.grid}>
+    <ul className={styles.postList}>
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <li key={post.id}>
+          <Postcard post={post} />
+        </li>
       ))}
-    </section>
+    </ul>
   );
 }
